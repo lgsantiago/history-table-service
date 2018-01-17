@@ -39,4 +39,4 @@ Complete all sections where marked TODO.
 
 Extend the existing test cases. A reviewer should be able to evaluate the correctness of your solution from the test cases alone without any knowledge of the implementation. We will be evaluating how you test as much as what you test.
 
-Commit frequently as you will be evaluated as much for your workflow as the end product.
+Commit frequently as you will be evaluated as much for your workflow as for the end product.
