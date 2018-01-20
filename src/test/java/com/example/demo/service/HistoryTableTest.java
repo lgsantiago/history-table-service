@@ -54,12 +54,10 @@ public class HistoryTableTest extends DemoApplicationTests {
     }
 
     @Test
-    public void testPutDuplicateDiffeentTimeRecord() throws Exception{
+    public void testPutDuplicateDifferentTimeRecord() throws Exception{
         Mockito.doReturn(1516427008446L).when(time).getCurrent();
         historyTable.put("duplicate", "duplicate");
-        historyTable.put("duplicate", "duplicate");
         Mockito.doReturn(1516427008450L).when(time).getCurrent();
-        historyTable.put("duplicate", "duplicate");
         historyTable.put("duplicate", "duplicate");
         Assert.assertEquals(2, historyTable.historyTable.get("duplicate").size());
     }
