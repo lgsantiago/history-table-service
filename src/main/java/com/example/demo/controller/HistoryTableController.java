@@ -5,6 +5,7 @@ import com.example.demo.model.HistoryTableGetResponse;
 import com.example.demo.model.HistoryTablePutRequest;
 import com.example.demo.model.HistoryTablePutResponse;
 import com.example.demo.service.HistoryTable;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -40,12 +41,26 @@ public class HistoryTableController {
     @RequestMapping(value = "/get", method = RequestMethod.POST)
     @ResponseBody
     public ResponseEntity<HistoryTableGetResponse> get(@RequestBody HistoryTableGetRequest request) {
+        try {
+            String value = historyTable.get(request.getKey(), request.getTimestamp());
 
-        String value = historyTable.get(request.getKey(), request.getTimestamp());
+            HistoryTableGetResponse response = new HistoryTableGetResponse();
+            response.setValue(value);
 
-        HistoryTableGetResponse response = new HistoryTableGetResponse();
-        response.setValue(value);
+            if(StringUtils.isEmpty(response.getValue()))
+                return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
 
-        return new ResponseEntity<>(response, HttpStatus.OK);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+        catch(Exception exception){
+            System.out.println(exception.getMessage());
+
+            if(exception.getCause() != null) {
+                if (exception.getCause().getMessage().equals("not_found"))
+                    return new ResponseEntity<>(new HistoryTableGetResponse(), HttpStatus.NOT_FOUND);
+            }
+
+            return new ResponseEntity<>(new HistoryTableGetResponse(), HttpStatus.BAD_REQUEST);
+        }
     }
 }

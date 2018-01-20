@@ -2,6 +2,7 @@ package com.example.demo.service;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Map;
 
@@ -16,22 +17,21 @@ public class HistoryTable {
         this.time = time;
     }
 
-    /*Map within a Map
-    The outer Map stores key and inner Map pair.
-    The inner Map stores time and value pair.
+    /*List within a Map
+    The outer Map stores key and List of time and value pairs.
     Example:
     KEY     | VALUE
-            | KEY   | VALUE
-    pet     | 7:00  | dog
-            | 9:00  | cat
-            | 10:20 | mouse
+            |
+    pet     | [(7:00  | dog),
+            |  (9:00  | cat),
+            |  (10:20 | mouse)]
 
-    food    | 8:10  | burger
-            | 9:00  | ramen
-            | 10:00 | pizza
+    food    | [(8:10  | burger),
+            | (9:00  | ramen),
+            | (10:00 | pizza)
 
     */
-    Map<String, Map<Long, String>> historyTable = new Hashtable<>();
+    Map<String, ArrayList<TimeValuePair>> historyTable = new Hashtable<>();
 
     /**
      * TODO: implement
@@ -47,16 +47,23 @@ public class HistoryTable {
         }
 
         Long timestamp = time.getCurrent();
-        Map<Long, String> timeValuePair = new Hashtable<>();
+        TimeValuePair newTimeValuePair = new TimeValuePair(timestamp, value);
+        ArrayList<TimeValuePair> timeValuePairList = new ArrayList<>();
 
         if(!historyTable.containsKey(key)){
-            timeValuePair.put(timestamp, value);
-            historyTable.put(key, timeValuePair);
+            timeValuePairList.add(newTimeValuePair);
+            historyTable.put(key, timeValuePairList);
         }
         else{
-            timeValuePair = historyTable.get(key);
-            timeValuePair.put(timestamp, value);
-            historyTable.put(key, timeValuePair);
+            timeValuePairList = historyTable.get(key);
+
+            // Check for duplicate entries inside list.
+            for(TimeValuePair timeValuePair : timeValuePairList){
+                if(isEqual(timeValuePair,newTimeValuePair))
+                    return timeValuePair.timestamp;
+            }
+
+            timeValuePairList.add(newTimeValuePair);
         }
 
         return timestamp;
@@ -69,13 +76,37 @@ public class HistoryTable {
      * @param timestamp Time at which the value of this key is to be returned.
      * @return Value associated with the key at the given timestamp.
      */
-    public String get(String key, Long timestamp) {
-        return "bar";
+    public String get(String key, Long timestamp) throws Exception {
+        if(!isValidInput(key, timestamp))
+            throw new Exception(String.format("Invalid input: key: %s timestamp: %d", key, timestamp));
+
+        if(!historyTable.containsKey(key)){
+            throw new Exception(String.format("Record not found in history. Key: %s", key), new Throwable("not_found"));
+        }
+
+        String result = "";
+        ArrayList<TimeValuePair> timeValuePairList = historyTable.get(key);
+
+        for(TimeValuePair timeValuePair : timeValuePairList){
+            if(timeValuePair.timestamp <= timestamp)
+                result = timeValuePair.value;
+        }
+
+        return result;
     }
 
     /* Check for null or empty values */
     private boolean isValidInput(String key, String value){
         return (!StringUtils.isEmpty(key) && !StringUtils.isEmpty(value));
+    }
+
+    private boolean isValidInput(String key, Long timestamp){
+        return (!StringUtils.isEmpty(key) && timestamp != null && timestamp > (Long) 0L);
+    }
+
+    private boolean isEqual(TimeValuePair timeValuePair, TimeValuePair newTimeValuePair){
+        return (timeValuePair.timestamp.equals(newTimeValuePair.timestamp) &&
+                timeValuePair.value.equals(newTimeValuePair.value));
     }
 
 }
