@@ -36,7 +36,9 @@ public class HistoryTableTest extends DemoApplicationTests {
     @Test
     public void testPut() throws Exception {
         Mockito.doCallRealMethod().when(time).getCurrent();
+
         Long timestamp = historyTable.put("foo", "bar");
+
         assertTrue((Long) 0L < timestamp);
         assertTrue(historyTable.historyTable.get("foo").size() == 1);
         assertEquals("bar", historyTable.historyTable.get("foo").get(0).value);
@@ -44,7 +46,20 @@ public class HistoryTableTest extends DemoApplicationTests {
     }
 
     @Test
-    public void testPutDuplicateSameTimeRecord() throws Exception{
+    public void testPutMultipleRecords() throws Exception {
+        Mockito.doCallRealMethod().when(time).getCurrent();
+        Long timestamp  = historyTable.put("hospital", "mount");
+        Long timestamp2 = historyTable.put("hospital", "kaiser");
+        Long timestamp3 = historyTable.put("hospital", "sacred");
+        assertTrue((Long) 0L < timestamp);
+        assertTrue(historyTable.historyTable.get("hospital").size() == 3);
+        assertEquals("kaiser", historyTable.historyTable.get("hospital").get(1).value);
+        assertEquals(timestamp2, historyTable.historyTable.get("hospital").get(1).timestamp);
+        assertEquals(timestamp3, historyTable.historyTable.get("hospital").get(2).timestamp);
+    }
+
+    @Test
+    public void testPutDuplicatesSameTime() throws Exception{
         Long timestamp = new Long(0151642);
         Mockito.doReturn(timestamp).when(time).getCurrent();
         Long duplicate1 = historyTable.put("duplicate", "duplicate");
@@ -59,7 +74,21 @@ public class HistoryTableTest extends DemoApplicationTests {
     }
 
     @Test
-    public void testPutDuplicateDifferentTimeRecord() throws Exception{
+    public void testPutOneDuplicateWithSameTime() throws Exception{
+        Mockito.doCallRealMethod().when(time).getCurrent();
+        Long original1 = historyTable.put("car", "original1");
+        Long original2 = historyTable.put("car", "original2");
+        Long original3 = historyTable.put("car", "original3");
+        Long original4 = historyTable.put("car", "original4");
+
+        Mockito.doReturn(original3).when(time).getCurrent();
+        Long duplicateOfOriginal3 = historyTable.put("car", "original3");
+
+        Assert.assertEquals(4, historyTable.historyTable.get("car").size());
+    }
+
+    @Test
+    public void testPutDuplicateDifferentTime() throws Exception{
         Mockito.doReturn(1516427008446L).when(time).getCurrent();
         historyTable.put("dup", "duplicate");
         Mockito.doReturn(1516427008450L).when(time).getCurrent();
@@ -68,8 +97,8 @@ public class HistoryTableTest extends DemoApplicationTests {
     }
 
     @Test
-    public void testPutNonDuplicateSameTimeRecord() throws Exception{
-        Mockito.doReturn((Long) 1516427008446L).when(time).getCurrent();
+    public void testPutNonDuplicateSameTime() throws Exception{
+        Mockito.doReturn( 1516427008446L).when(time).getCurrent();
         historyTable.put("city", "miami");
         historyTable.put("city", "london");
         historyTable.put("city", "san francisco");
@@ -87,10 +116,122 @@ public class HistoryTableTest extends DemoApplicationTests {
     }
 
     @Test
-    @Ignore
     public void testGet() throws Exception {
         Mockito.doCallRealMethod().when(time).getCurrent();
-        String value = historyTable.get("foo", 1L);
-        assertEquals("bar", value);
+
+        Long timestampBurger = historyTable.put("food", "burger");
+
+        String value = historyTable.get("food", timestampBurger);
+        assertEquals("burger", value);
     }
+
+    @Test
+    public void testGetPastMoment() throws Exception {
+        Mockito.doCallRealMethod().when(time).getCurrent();
+        historyTable.put("park", "alamo");
+        historyTable.put("park", "golden gate");
+        historyTable.put("park", "dolores");
+        Thread.sleep(1000);
+
+        assertEquals("dolores", historyTable.get("park", time.getCurrent()));
+    }
+
+    @Test
+    public void testGetMultipleRecords() throws Exception {
+        Mockito.doCallRealMethod().when(time).getCurrent();
+        Long timestampEggs = historyTable.put("food", "eggs");
+        Long timestampChicken = historyTable.put("food", "chicken");
+
+        assertEquals("eggs", historyTable.get("food", timestampEggs));
+        assertEquals("chicken", historyTable.get("food", timestampChicken));
+    }
+
+    @Test
+    public void testGetMultipleTimestampInBetween() throws Exception {
+        Mockito.doCallRealMethod().when(time).getCurrent();
+
+        historyTable.put("restaurant", "kitchen story");
+
+        Thread.sleep(100);
+        Long timestampInBetween = time.getCurrent();
+        Thread.sleep(100);
+
+        historyTable.put("restaurant", "myriad");
+
+        assertEquals("kitchen story", historyTable.get("restaurant", timestampInBetween));
+    }
+
+    @Test
+    public void testGetEarlierTimestamp() throws Exception {
+        Mockito.doCallRealMethod().when(time).getCurrent();
+
+        Long timestamp = time.getCurrent();
+        Thread.sleep(100);
+
+        historyTable.put("name", "jessica");
+        historyTable.put("name", "luis");
+        historyTable.put("name", "jason");
+
+        assertTrue(historyTable.get("name", timestamp).isEmpty());
+    }
+
+    @Test(expected = Exception.class)
+    public void testGetNonExistent() throws Exception {
+        Mockito.doCallRealMethod().when(time).getCurrent();
+
+        Long timestamp = time.getCurrent();
+
+        historyTable.get("nokey", timestamp);
+    }
+
+    /* This is an A/B performance test between methods
+    * get and getB.
+    * These are the results after running a few tests
+    * locally:
+    *
+    * 50 records:
+    *  get A: 0.149897
+    *  get B: 0.031214
+    *
+    * 100 records:
+    *  get A: 0.071318
+    *  get B: 0.071269
+    *
+    * 300 records:
+    *  get A: 0.083242
+    *  get B: 0.157169
+    * */
+    @Test
+    @Ignore
+    public void testGetPerformance() throws Exception {
+        Mockito.doCallRealMethod().when(time).getCurrent();
+        Long timestamp = 0L;
+
+        for(int i = 0; i < 300; i++){
+            String value = "test" + i;
+
+            if(i == 10)
+                timestamp = historyTable.put("performance", value);
+            else
+                historyTable.put("performance", value);
+
+            Thread.sleep(100);
+        }
+
+        Long start = System.nanoTime();
+        historyTable.get("performance", timestamp);
+        Long end = System.nanoTime();
+
+        Long startB = System.nanoTime();
+        historyTable.getB("performance", timestamp);
+        Long endB = System.nanoTime();
+
+        System.out.println("Timestamp: "+ timestamp);
+        System.out.println("Get A: "+ (end-start) / 1e6);
+        System.out.println("Get B: "+ (endB-startB) / 1e6);
+    }
+
+
+
+
 }
