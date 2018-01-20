@@ -23,9 +23,19 @@ public class HistoryTableTest {
      */
 
     @Test
-    public void testPut() {
+    public void testPut() throws Exception {
         Long timestamp = historyTable.put("foo", "bar");
         assertTrue((Long) 0L < timestamp);
+    }
+
+    @Test(expected = Exception.class)
+    public void testPutInvalidInput() throws Exception {
+        historyTable.put("foo", null);
+    }
+
+    @Test(expected = Exception.class)
+    public void testPutEmptyInput() throws Exception {
+        historyTable.put("", "");
     }
 
     @Test
