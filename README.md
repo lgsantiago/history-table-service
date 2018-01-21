@@ -31,7 +31,7 @@ You are encouraged to use your favorite IDE. You may start the application by ru
 
 ### Complexity analysis
 
-####put(key, value):
+###put(key, value):
 
 case #1: History Table is empty. Perform normal insert. Speed: O(1).
 
@@ -39,7 +39,7 @@ case #2: History Table is not empty, no potential duplicates. Perform normal ins
 
 case #3: History Table is not empty and there are potential duplicates: Perform binary search to find possible duplicates. Best case: O(1), Worst case: O(log n), Average case: O(log n).
 
-####get(key, timestamp)
+###get(key, timestamp)
 
 case #1: The timestamp requested is less than the timestamp of first element in time value pair list. Speed: O(1).
 
