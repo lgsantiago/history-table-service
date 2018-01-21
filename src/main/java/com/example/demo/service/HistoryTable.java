@@ -18,7 +18,7 @@ public class HistoryTable {
     }
 
     /*List within a Map
-    The outer Map stores keys and a list of time and value pair objects.
+    The Map stores keys and a list of time and value pair objects.
     Example:
     KEY     | VALUE
             |
@@ -112,6 +112,12 @@ public class HistoryTable {
         if(timestamp < timeValuePairList.get(0).timestamp)
             return result;
 
+        /* If timestamp requested is greater than
+        * or equal than last element's timestamp then return
+        * its value.*/
+        if(timestamp >= timeValuePairList.get(timeValuePairList.size()-1).timestamp)
+            return timeValuePairList.get(timeValuePairList.size()-1).value;
+
         // Search for value
         for(TimeValuePair timeValuePair : timeValuePairList){
             /*
@@ -119,7 +125,7 @@ public class HistoryTable {
             when the time value pair list is too long. This eliminates
             the need to iterate the entire list.
             */
-            if(timeValuePair.timestamp == timestamp)
+            if(timeValuePair.timestamp.equals(timestamp))
                 return timeValuePair.value;
 
             if(timeValuePair.timestamp <= timestamp)
@@ -151,6 +157,9 @@ public class HistoryTable {
         * empty value. */
         if(timestamp < timeValuePairList.get(0).timestamp)
             return result;
+
+        if(timestamp >= timeValuePairList.get(timeValuePairList.size()-1).timestamp)
+            return timeValuePairList.get(timeValuePairList.size()-1).value;
 
         // Search for value
         for(TimeValuePair timeValuePair : timeValuePairList){

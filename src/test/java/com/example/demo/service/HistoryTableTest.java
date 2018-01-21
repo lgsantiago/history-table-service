@@ -133,7 +133,6 @@ public class HistoryTableTest extends DemoApplicationTests {
         historyTable.put("park", "alamo");
         historyTable.put("park", "golden gate");
         historyTable.put("park", "dolores");
-        Thread.sleep(1000);
 
         assertEquals("dolores", historyTable.get("park", time.getCurrent()));
     }
@@ -142,6 +141,7 @@ public class HistoryTableTest extends DemoApplicationTests {
     public void testGetMultipleRecords() throws Exception {
         Mockito.doCallRealMethod().when(time).getCurrent();
         Long timestampEggs = historyTable.put("food", "eggs");
+        Thread.sleep(100);
         Long timestampChicken = historyTable.put("food", "chicken");
 
         assertEquals("eggs", historyTable.get("food", timestampEggs));
@@ -201,23 +201,24 @@ public class HistoryTableTest extends DemoApplicationTests {
         historyTable.get("foo", -123L);
     }
 
-    /* This is a performance test on methods
+    /* This is a speed performance test on methods
     * get and getB.
     *
     * These are the results after running a few tests
     * locally:
     *
-    * 50 records:
-    *  get A: 0.149897
-    *  get B: 0.031214
-    *
-    * 100 records:
-    *  get A: 0.071318
-    *  get B: 0.071269
-    *
     * 300 records:
-    *  get A: 0.083242
-    *  get B: 0.157169
+    * get A: 0.220659
+    * get B: 0.121499
+    *
+    * 500 records:
+    * get A: 0.190941
+    * get B: 0.144306
+    *
+    * 800 records:
+    * get A: 0.159634
+    * get B: 0.283282
+    *
     * */
     @Test
     @Ignore
@@ -225,7 +226,7 @@ public class HistoryTableTest extends DemoApplicationTests {
         Mockito.doCallRealMethod().when(time).getCurrent();
         Long timestamp = 0L;
 
-        for(int i = 0; i < 300; i++){
+        for(int i = 0; i < 800; i++){
             String value = "test" + i;
 
             if(i == 10)

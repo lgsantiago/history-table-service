@@ -31,7 +31,22 @@ You are encouraged to use your favorite IDE. You may start the application by ru
 
 ### Complexity analysis
 
-// TODO: analyze the performance of your implementation.
+####put(key, value):
+
+case #1: History Table is empty. Perform normal insert. Speed: O(1).
+
+case #2: History Table is not empty, no potential duplicates. Perform normal insert. Speed: O(1).
+
+case #3: History Table is not empty and there are potential duplicates: Perform binary search to find possible duplicates. Best case: O(1), Worst case: O(log n), Average case: O(log n).
+
+####get(key, timestamp)
+
+case #1: The timestamp requested is less than the timestamp of first element in time value pair list. Speed: O(1).
+
+case #2: The timestamp requested is greater than or equal than last item in time value pair list. Speed O(1).
+
+case #3: Search for value inside time value pair list. Iterate linearly: Best case: exact timestamp is found and break loop: Speed O(n). Worst case: iterate entire list: Speed O(n). Where n is the number elements inside time value pair list.
+ 
 
 ### Your Task
 
