@@ -74,15 +74,16 @@ public class HistoryTableTest extends DemoApplicationTests {
     }
 
     @Test
-    public void testPutOneDuplicateWithSameTime() throws Exception{
+    public void testPutOneDuplicate() throws Exception{
         Mockito.doCallRealMethod().when(time).getCurrent();
-        Long original1 = historyTable.put("car", "original1");
-        Long original2 = historyTable.put("car", "original2");
+        historyTable.put("car", "original1");
+        historyTable.put("car", "original2");
         Long original3 = historyTable.put("car", "original3");
-        Long original4 = historyTable.put("car", "original4");
+        historyTable.put("car", "original4");
 
+        // Duplicate of original3
         Mockito.doReturn(original3).when(time).getCurrent();
-        Long duplicateOfOriginal3 = historyTable.put("car", "original3");
+        historyTable.put("car", "original3");
 
         Assert.assertEquals(4, historyTable.historyTable.get("car").size());
     }
@@ -103,6 +104,7 @@ public class HistoryTableTest extends DemoApplicationTests {
         historyTable.put("city", "london");
         historyTable.put("city", "san francisco");
         Assert.assertEquals(3, historyTable.historyTable.get("city").size());
+        Assert.assertEquals("san francisco", historyTable.get("city", 1516427008446L));
     }
 
     @Test(expected = Exception.class)
@@ -184,8 +186,24 @@ public class HistoryTableTest extends DemoApplicationTests {
         historyTable.get("nokey", timestamp);
     }
 
-    /* This is an A/B performance test between methods
+    @Test(expected = Exception.class)
+    public void testGetInvalidInput() throws Exception {
+        historyTable.get("foo", null);
+    }
+
+    @Test(expected = Exception.class)
+    public void testGetEmptyInput() throws Exception {
+        historyTable.get("", null);
+    }
+
+    @Test(expected = Exception.class)
+    public void testGetInvalidTimestamp() throws Exception {
+        historyTable.get("foo", -123L);
+    }
+
+    /* This is a performance test on methods
     * get and getB.
+    *
     * These are the results after running a few tests
     * locally:
     *

@@ -27,7 +27,13 @@ public class HistoryTableController {
     @ResponseBody
     public ResponseEntity<HistoryTablePutResponse> put(@RequestBody HistoryTablePutRequest request) {
         try {
+            System.out.println("key: " + request.getKey());
+            System.out.println("value: " + request.getValue());
+
             Long timestamp = historyTable.put(request.getKey(), request.getValue());
+
+            System.out.println("Timestamp: " + timestamp);
+
             HistoryTablePutResponse response = new HistoryTablePutResponse();
             response.setTimestamp(timestamp);
             return new ResponseEntity<>(response, HttpStatus.OK);
@@ -42,7 +48,12 @@ public class HistoryTableController {
     @ResponseBody
     public ResponseEntity<HistoryTableGetResponse> get(@RequestBody HistoryTableGetRequest request) {
         try {
+            System.out.println("key: " + request.getKey());
+            System.out.println("timestamp: " + request.getTimestamp());
+
             String value = historyTable.get(request.getKey(), request.getTimestamp());
+
+            System.out.println("Value: " + value);
 
             HistoryTableGetResponse response = new HistoryTableGetResponse();
             response.setValue(value);

@@ -18,7 +18,7 @@ public class HistoryTable {
     }
 
     /*List within a Map
-    The outer Map stores keys and a list of time and value pairs objects.
+    The outer Map stores keys and a list of time and value pair objects.
     Example:
     KEY     | VALUE
             |
@@ -130,7 +130,7 @@ public class HistoryTable {
     }
 
     /* getB contains my initial approach on the search portion. I kept this
-    method to run an A/B test on performance against the get method above.
+    method to run a performance test against the get method above.
     See testGetPerformance() inside HistoryTable class.*/
     public String getB(String key, Long timestamp) throws Exception {
         String result = "";
