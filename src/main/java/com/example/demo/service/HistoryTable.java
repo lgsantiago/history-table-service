@@ -179,7 +179,7 @@ public class HistoryTable {
     private boolean isValidInput(String key, Long timestamp){
         return (!StringUtils.isEmpty(key) && timestamp != null && timestamp > (Long) 0L);
     }
-
+    /* Check for equal timestamp and value*/
     private boolean isEqual(TimeValuePair timeValuePair, TimeValuePair newTimeValuePair){
         return (timeValuePair.timestamp.equals(newTimeValuePair.timestamp) &&
                 timeValuePair.value.equals(newTimeValuePair.value));
