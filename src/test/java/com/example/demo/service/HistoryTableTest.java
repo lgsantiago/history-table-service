@@ -234,7 +234,6 @@ public class HistoryTableTest extends DemoApplicationTests {
             else
                 historyTable.put("performance", value);
 
-            Thread.sleep(100);
         }
 
         Long start = System.nanoTime();
