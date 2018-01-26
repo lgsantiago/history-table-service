@@ -1,7 +1,7 @@
 # History Table
 
 ### Description
-Write a HistoryTable which is a key-value store that can also tell you the values at past moments in time.
+HistoryTable which is a key-value store that can also tell you the values at past moments in time.
 
 
 put(key, value) // Normal "put" - stores the key/value pair\
