@@ -1,8 +1,5 @@
 package com.example.demo.model;
 
-/**
- * DO NOT MODIFY
- */
 public class HistoryTablePutRequest {
 
     private String key;

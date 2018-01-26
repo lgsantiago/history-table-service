@@ -1,8 +1,5 @@
 package com.example.demo.model;
 
-/**
- * DO NOT MODIFY
- */
 public class HistoryTableGetResponse {
 
     private String value;
