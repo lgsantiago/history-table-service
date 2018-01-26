@@ -1,6 +1,6 @@
 # History Table
 
-### Problem discription
+### Description
 Write a HistoryTable which is a key-value store that can also tell you the values at past moments in time.
 
 
