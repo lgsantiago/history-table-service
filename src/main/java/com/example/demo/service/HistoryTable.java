@@ -1,10 +1,12 @@
 package com.example.demo.service;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.Objects;
 
 public class HistoryTable {
 
@@ -114,9 +116,14 @@ public class HistoryTable {
 
         /* If timestamp requested is greater than
         * or equal than last element's timestamp then return
-        * its value.*/
+        * last value.*/
         if(timestamp >= timeValuePairList.get(timeValuePairList.size()-1).timestamp)
             return timeValuePairList.get(timeValuePairList.size()-1).value;
+
+        /* Perform binary search on list*/
+        String value = searchValue(timeValuePairList, timestamp);
+        if (!StringUtils.isEmpty(value))
+            return value;
 
         // Search for value
         for(TimeValuePair timeValuePair : timeValuePairList){
@@ -203,9 +210,27 @@ public class HistoryTable {
                 end = mid-1;
             else
                 start = mid + 1;
-
         }
 
         return -1L;
+    }
+
+    private String searchValue(ArrayList<TimeValuePair> timeValuePairList, Long targetTimestamp){
+        int start = 0;
+        int end = timeValuePairList.size()-1;
+
+        while(start <= end){
+            int mid = (start + end) / 2;
+
+            if(timeValuePairList.get(mid).timestamp.equals(targetTimestamp))
+                return timeValuePairList.get(mid).value;
+
+            if(targetTimestamp < timeValuePairList.get(mid).timestamp)
+                end = mid-1;
+            else
+                start = mid + 1;
+        }
+
+        return null;
     }
 }
